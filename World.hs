@@ -2,36 +2,24 @@ module World where
 
 import Control.Monad.State
 import qualified Data.Map as Map
-import Data.Function
-import qualified Object as Obj
+import Object 
 
-data Room = Room { 
-    name::String, 
-    contents::[String]
-    } deriving (Show)
+type World = Map.Map String Object
 
-type World = Map.Map String Room
+giveObj :: Object -> StateT World IO ()
+giveObj obj = StateT $ \world -> 
+    return ((), Map.insert (name obj) obj world)
 
-giveRoom :: Room -> State World ()
-giveRoom room = state $ \world -> 
-    ((), Map.insert (name room) room world)
-
-takeRoom :: String -> State World (Maybe Room)
-takeRoom name = state $ \world -> let
-    room = Map.lookup name world
+takeObj :: String -> StateT World IO (Maybe Object)
+takeObj name = StateT $ \world -> let
+    obj = Map.lookup name world
     world' = Map.delete name world
-    in (room, world')
+    in return (obj, world')
 
-ball = Obj.Object "ball" "r1" Nothing
-
-r1 = Room "one" ["ball"]
-
-r2 = Room "two" []
-
-r3 = Room "three" []
-
-w = Map.empty & (runState $ giveRoom r1 >> giveRoom r2) & snd
-
-test = do 
-    giveRoom r3
-    takeRoom "one"
+takeObj' :: String -> StateT World IO (Maybe Object)
+takeObj' name = do
+    world <- get
+    let obj = Map.lookup name world
+        world' = Map.delete name world
+    put world'
+    return obj

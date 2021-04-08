@@ -1,11 +1,16 @@
 module Object (
-    Object (..)
+    Object (..),
+    room
 ) where
+
+import qualified Data.Map as Map
 
 data Object = Object {
     name::String,
     location::String,
-    contents::Maybe [String]
+    adj::Maybe (Map.Map String String),
+    contents::Maybe [String]  
 } deriving (Show)
 
-screwdriver = Object "screwdriver" "workshop" Nothing
+room n l a c = 
+    Object n l (Just $ Map.fromList a) (Just c)
