@@ -10,6 +10,10 @@ giveObj :: Object -> StateT World IO ()
 giveObj obj = StateT $ \world -> 
     return ((), Map.insert (name obj) obj world)
 
+lookupObj :: String -> StateT World IO (Maybe Object)
+lookupObj name = StateT $ \world -> 
+    return (Map.lookup name world, world)
+
 takeObj :: String -> StateT World IO (Maybe Object)
 takeObj name = StateT $ \world -> let
     obj = Map.lookup name world
